@@ -12,19 +12,15 @@ import Link from 'next/link';
 export default function Home() {
 	return (
 		<div className='flex flex-col min-h-screen'>
-			{/* Header */}
 			<header className='border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50'>
 				<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 					<div className='flex h-16 items-center justify-between'>
-						{/* Logo */}
 						<div className='flex items-center'>
-							<DollarSign className='h-8 w-8 text-gray-900' />
 							<span className='ml-2 text-xl font-bold text-gray-900'>
 								KeExpense Tracker
 							</span>
 						</div>
 
-						{/* Desktop Navigation */}
 						<nav className='hidden md:flex items-center space-x-8'>
 							<Link
 								href='#features'
@@ -40,19 +36,20 @@ export default function Home() {
 							</Link>
 						</nav>
 
-						{/* Action Buttons */}
 						<div className='flex items-center space-x-4'>
 							<Button
 								variant='ghost'
-								className='hidden sm:inline-flex'
+								className='hidden sm:inline-flex cursor-pointer'
 							>
 								Sign In
 							</Button>
-							<Button>Get Started</Button>
+							<Button className='cursor-pointer'>
+								Get Started
+							</Button>
 							<Button
 								variant='ghost'
 								size='icon'
-								className='md:hidden'
+								className='md:hidden cursor-pointer'
 							>
 								<Menu className='h-5 w-5' />
 							</Button>
@@ -62,7 +59,6 @@ export default function Home() {
 			</header>
 
 			<main className='flex-1'>
-				{/* Hero Section */}
 				<section className='py-20 sm:py-32 bg-gradient-to-b from-gray-50 to-white'>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 						<div className='text-center max-w-4xl mx-auto'>
@@ -93,7 +89,6 @@ export default function Home() {
 					</div>
 				</section>
 
-				{/* Feature Cards */}
 				<section id='features' className='py-20 bg-white'>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 						<div className='text-center mb-16'>
@@ -107,7 +102,6 @@ export default function Home() {
 						</div>
 
 						<div className='grid md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
-							{/* Easy Tracking Card */}
 							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
 								<CardHeader>
 									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -127,7 +121,6 @@ export default function Home() {
 								</CardContent>
 							</Card>
 
-							{/* Smart Analytics Card */}
 							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
 								<CardHeader>
 									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -147,7 +140,6 @@ export default function Home() {
 								</CardContent>
 							</Card>
 
-							{/* Multi Account Card */}
 							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
 								<CardHeader>
 									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -169,7 +161,6 @@ export default function Home() {
 					</div>
 				</section>
 
-				{/* CTA Section */}
 				<section className='py-20 bg-gray-900'>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8 text-center'>
 						<h2 className='text-3xl sm:text-4xl font-bold text-white mb-4'>
@@ -190,15 +181,13 @@ export default function Home() {
 				</section>
 			</main>
 
-			{/* Footer */}
 			<footer className='bg-gray-900 text-white py-12'>
 				<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 					<div className='grid md:grid-cols-4 gap-8'>
 						<div className='col-span-2'>
 							<div className='flex items-center mb-4'>
-								<DollarSign className='h-8 w-8 text-gray-400' />
 								<span className='ml-2 text-xl font-bold'>
-									ExpenseTracker
+									KeExpense Tracker
 								</span>
 							</div>
 							<p className='text-gray-400 max-w-md'>
@@ -252,7 +241,7 @@ export default function Home() {
 										href='#'
 										className='hover:text-white transition-colors'
 									>
-										Contact
+										Team
 									</Link>
 								</li>
 								<li>
@@ -260,17 +249,35 @@ export default function Home() {
 										href='#'
 										className='hover:text-white transition-colors'
 									>
-										Privacy
+										Careers
+									</Link>
+								</li>
+							</ul>
+						</div>
+						<div>
+							<h3 className='font-semibold mb-4'>Legal</h3>
+							<ul className='space-y-2 text-gray-400'>
+								<li>
+									<Link
+										href='#'
+										className='hover:text-white transition-colors'
+									>
+										Privacy Policy
+									</Link>
+								</li>
+								<li>
+									<Link
+										href='#'
+										className='hover:text-white transition-colors'
+									>
+										Terms of Service
 									</Link>
 								</li>
 							</ul>
 						</div>
 					</div>
-					<div className='border-t border-gray-800 mt-8 pt-8 text-center text-gray-400'>
-						<p>
-							&copy; {new Date().getFullYear()} ExpenseTracker.
-							All rights reserved.
-						</p>
+					<div className='mt-8 pt-8 border-t border-gray-800 text-center text-gray-500'>
+						© 2024 KeExpense Tracker. All rights reserved.
 					</div>
 				</div>
 			</footer>
