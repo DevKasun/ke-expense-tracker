@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/card';
 import { DollarSign, BarChart3, Building2, Menu } from 'lucide-react';
 import Link from 'next/link';
+import { APP_NAME } from '@/constant';
 
 export default function Home() {
 	return (
@@ -17,7 +18,7 @@ export default function Home() {
 					<div className='flex h-16 items-center justify-between'>
 						<div className='flex items-center'>
 							<span className='ml-2 text-xl font-bold text-gray-900'>
-								KeExpense Tracker
+								{APP_NAME}
 							</span>
 						</div>
 
@@ -187,7 +188,7 @@ export default function Home() {
 						<div className='col-span-2'>
 							<div className='flex items-center mb-4'>
 								<span className='ml-2 text-xl font-bold'>
-									KeExpense Tracker
+									{APP_NAME}
 								</span>
 							</div>
 							<p className='text-gray-400 max-w-md'>
@@ -277,7 +278,7 @@ export default function Home() {
 						</div>
 					</div>
 					<div className='mt-8 pt-8 border-t border-gray-800 text-center text-gray-500'>
-						© 2024 KeExpense Tracker. All rights reserved.
+						© 2024 {APP_NAME}. All rights reserved.
 					</div>
 				</div>
 			</footer>
