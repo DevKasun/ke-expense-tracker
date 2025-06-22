@@ -38,15 +38,19 @@ export default function Home() {
 						</nav>
 
 						<div className='flex items-center space-x-4'>
-							<Button
-								variant='ghost'
-								className='hidden sm:inline-flex cursor-pointer'
-							>
-								Sign In
-							</Button>
-							<Button className='cursor-pointer'>
-								Get Started
-							</Button>
+							<Link href='/login'>
+								<Button
+									variant='ghost'
+									className='hidden sm:inline-flex cursor-pointer'
+								>
+									Sign In
+								</Button>
+							</Link>
+							<Link href='/login'>
+								<Button className='cursor-pointer'>
+									Get Started
+								</Button>
+							</Link>
 							<Button
 								variant='ghost'
 								size='icon'
@@ -75,9 +79,14 @@ export default function Home() {
 								and achieve your financial goals.
 							</p>
 							<div className='flex flex-col sm:flex-row gap-4 justify-center'>
-								<Button size='lg' className='text-lg px-8 py-3'>
-									Get Started Free
-								</Button>
+								<Link href='/login'>
+									<Button
+										size='lg'
+										className='text-lg px-8 py-3'
+									>
+										Get Started Free
+									</Button>
+								</Link>
 								<Button
 									variant='outline'
 									size='lg'
@@ -171,13 +180,15 @@ export default function Home() {
 							Join thousands of users who have already transformed
 							their financial habits
 						</p>
-						<Button
-							size='lg'
-							variant='secondary'
-							className='text-lg px-8 py-3'
-						>
-							Start Your Free Trial
-						</Button>
+						<Link href='/login'>
+							<Button
+								size='lg'
+								variant='secondary'
+								className='text-lg px-8 py-3'
+							>
+								Start Your Free Trial
+							</Button>
+						</Link>
 					</div>
 				</section>
 			</main>
