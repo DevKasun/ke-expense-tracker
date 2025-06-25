@@ -1,62 +1,68 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function DashboardPage() {
-	const { user, loading, signOut } = useAuth();
-
-	if (loading) {
-		return (
-			<div className='min-h-screen flex items-center justify-center'>
-				<div className='text-lg'>Loading...</div>
-			</div>
-		);
-	}
+	const { user } = useAuth();
 
 	return (
-		<div className='min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
-			<div className='max-w-md mx-auto'>
+		<div className='max-w-4xl mx-auto space-y-6'>
+			<div>
+				<h2 className='text-3xl font-bold text-gray-900'>
+					Welcome back
+					{user?.email ? `, ${user.email.split('@')[0]}` : ''}!
+				</h2>
+				<p className='text-gray-600 mt-2'>
+					Here's your expense tracking overview
+				</p>
+			</div>
+
+			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 				<Card className='p-6'>
-					<h1 className='text-2xl font-bold mb-6 text-center'>
-						Dashboard
-					</h1>
+					<h3 className='text-lg font-semibold mb-2'>
+						Quick Actions
+					</h3>
+					<div className='space-y-3'>
+						<Button asChild className='w-full'>
+							<Link href='/dashboard/expenses/add'>
+								Add Expense
+							</Link>
+						</Button>
+						<Button asChild variant='outline' className='w-full'>
+							<Link href='/dashboard/expenses'>
+								View Expenses
+							</Link>
+						</Button>
+					</div>
+				</Card>
 
-					{user && (
-						<div className='space-y-4'>
-							<div>
-								<p className='text-sm font-medium text-gray-600'>
-									Email:
-								</p>
-								<p className='text-lg'>{user.email}</p>
-							</div>
-
-							<div>
-								<p className='text-sm font-medium text-gray-600'>
-									User ID:
-								</p>
-								<p className='text-sm text-gray-500 break-all'>
-									{user.id}
-								</p>
-							</div>
-
-							<div>
-								<p className='text-sm font-medium text-gray-600'>
-									Account created:
-								</p>
-								<p className='text-sm text-gray-500'>
-									{new Date(
-										user.created_at
-									).toLocaleDateString()}
-								</p>
-							</div>
-
-							<Button onClick={signOut} className='w-full mt-6'>
-								Sign Out
-							</Button>
+				<Card className='p-6'>
+					<h3 className='text-lg font-semibold mb-2'>This Month</h3>
+					<div className='space-y-2'>
+						<div className='flex justify-between'>
+							<span className='text-gray-600'>Total Spent:</span>
+							<span className='font-semibold'>$0.00</span>
 						</div>
-					)}
+						<div className='flex justify-between'>
+							<span className='text-gray-600'>Transactions:</span>
+							<span className='font-semibold'>0</span>
+						</div>
+					</div>
+				</Card>
+
+				<Card className='p-6'>
+					<h3 className='text-lg font-semibold mb-2'>Account</h3>
+					<div className='space-y-3'>
+						<Button asChild variant='outline' className='w-full'>
+							<Link href='/dashboard/profile'>View Profile</Link>
+						</Button>
+						<Button asChild variant='outline' className='w-full'>
+							<Link href='/dashboard/settings'>Settings</Link>
+						</Button>
+					</div>
 				</Card>
 			</div>
 		</div>
