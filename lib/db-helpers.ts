@@ -1,22 +1,9 @@
 import { createServerSupabaseClient } from './supabase/supabase-server'
 import { z } from 'zod'
 
-export type BankAccountType = 'CHECKING' | 'SAVINGS' | 'CREDIT_CARD' | 'CASH' | 'INVESTMENT' | 'OTHER'
-
 export interface User {
     id: string
     email: string
-    created_at: string
-    updated_at: string
-}
-
-export interface BankAccount {
-    id: string
-    user_id: string
-    name: string
-    type: BankAccountType
-    balance: number
-    description?: string
     created_at: string
     updated_at: string
 }
@@ -40,14 +27,12 @@ export interface Expense {
     amount: number
     date: string
     category_id: string
-    bank_account_id: string
     created_at: string
     updated_at: string
 }
 
 export type ExpenseWithRelations = Expense & {
     category: Category
-    bankAccount: BankAccount
 }
 
 export type CategoryWithStats = Category & {
@@ -61,15 +46,7 @@ export const expenseSchema = z.object({
     description: z.string().max(500).optional(),
     amount: z.number().positive('Amount must be positive').max(999999.99),
     date: z.date().max(new Date(), 'Date cannot be in the future'),
-    categoryId: z.string().uuid('Invalid category'),
-    bankAccountId: z.string().uuid('Invalid account'),
-})
-
-export const bankAccountSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(50),
-    type: z.enum(['CHECKING', 'SAVINGS', 'CREDIT_CARD', 'CASH', 'INVESTMENT', 'OTHER']),
-    balance: z.number().multipleOf(0.01).optional(),
-    description: z.string().max(200).optional(),
+    category_id: z.string().uuid('Invalid category'),
 })
 
 export const categorySchema = z.object({
@@ -80,7 +57,6 @@ export const categorySchema = z.object({
 })
 
 export type ExpenseFormData = z.infer<typeof expenseSchema>
-export type BankAccountFormData = z.infer<typeof bankAccountSchema>
 export type CategoryFormData = z.infer<typeof categorySchema>
 
 // Database helper functions
@@ -104,8 +80,7 @@ export async function getExpensesWithRelations(userId: string, limit = 50) {
         .from('expenses')
         .select(`
       *,
-      category:categories(*),
-      bankAccount:bank_accounts(*)
+      category:categories(*)
     `)
         .eq('user_id', userId)
         .order('date', { ascending: false })
@@ -144,4 +119,85 @@ export async function getMonthlyExpenseSummary(userId: string, year: number, mon
 
     if (error) throw error
     return data
+}
+
+export async function createExpense(expenseData: {
+    title: string
+    description?: string
+    amount: number
+    date: string
+    category_id: string
+    user_id: string
+}) {
+    const supabase = await createServerSupabaseClient()
+
+    const { data, error } = await supabase
+        .from('expenses')
+        .insert(expenseData)
+        .select()
+        .single()
+
+    if (error) throw error
+    return data
+}
+
+export async function getCategories(userId: string) {
+    const supabase = await createServerSupabaseClient()
+
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('user_id', userId)
+        .order('name')
+
+    if (error) throw error
+    return data as Category[]
+}
+
+export async function createCategory(categoryData: {
+    name: string
+    color: string
+    icon?: string
+    description?: string
+    user_id: string
+}) {
+    const supabase = await createServerSupabaseClient()
+
+    const { data, error } = await supabase
+        .from('categories')
+        .insert(categoryData)
+        .select()
+        .single()
+
+    if (error) throw error
+    return data
+}
+
+export async function ensureUserExists(userId: string, email: string) {
+    const supabase = await createServerSupabaseClient()
+
+    // Check if user exists in our users table
+    const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userId)
+        .single()
+
+    if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError
+    }
+
+    // If user doesn't exist, create them
+    if (!existingUser) {
+        try {
+            await createUser({
+                id: userId,
+                email: email || ''
+            })
+        } catch (error) {
+            console.error('Error creating user record:', error)
+            // Don't throw here if user creation fails, as they might already exist
+            // due to race conditions
+        }
+    }
 }
