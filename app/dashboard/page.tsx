@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AddExpenseDrawer } from '@/components/expenses/add-expense-drawer';
 import Link from 'next/link';
 
 export default function DashboardPage() {
 	const { user } = useAuth();
+	const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
 
 	return (
 		<div className='max-w-4xl mx-auto space-y-6'>
@@ -26,10 +29,11 @@ export default function DashboardPage() {
 						Quick Actions
 					</h3>
 					<div className='space-y-3'>
-						<Button asChild className='w-full'>
-							<Link href='/dashboard/expenses/add'>
-								Add Expense
-							</Link>
+						<Button
+							className='w-full'
+							onClick={() => setIsAddExpenseOpen(true)}
+						>
+							Add Expense
 						</Button>
 						<Button asChild variant='outline' className='w-full'>
 							<Link href='/dashboard/expenses'>
@@ -65,6 +69,11 @@ export default function DashboardPage() {
 					</div>
 				</Card>
 			</div>
+
+			<AddExpenseDrawer
+				open={isAddExpenseOpen}
+				onOpenChange={setIsAddExpenseOpen}
+			/>
 		</div>
 	);
 }
