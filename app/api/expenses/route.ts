@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/supabase-server'
-import { expenseSchema, createExpense, ensureUserExists } from '@/lib/db-helpers'
+import { expenseSchema, createExpense, ensureUserExists, getExpensesWithRelations } from '@/lib/db-helpers'
 import { z } from 'zod'
 
 const createExpenseRequestSchema = z.object({
@@ -14,6 +14,33 @@ const createExpenseRequestSchema = z.object({
     amount: data.amount,
     date: data.date.toISOString().split('T')[0],
 }))
+
+export async function GET(request: NextRequest) {
+    try {
+        const supabase = await createServerSupabaseClient()
+
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            )
+        }
+
+        const { searchParams } = new URL(request.url)
+        const limit = parseInt(searchParams.get('limit') || '50')
+
+        const expenses = await getExpensesWithRelations(user.id, limit)
+
+        return NextResponse.json(expenses)
+    } catch (error) {
+        console.error('Error fetching expenses:', error)
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        )
+    }
+}
 
 export async function POST(request: NextRequest) {
     try {
