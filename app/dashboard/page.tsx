@@ -50,10 +50,6 @@ export default function DashboardPage() {
 							<span className='text-gray-600'>Total Spent:</span>
 							<span className='font-semibold'>$0.00</span>
 						</div>
-						<div className='flex justify-between'>
-							<span className='text-gray-600'>Transactions:</span>
-							<span className='font-semibold'>0</span>
-						</div>
 					</div>
 				</Card>
 
