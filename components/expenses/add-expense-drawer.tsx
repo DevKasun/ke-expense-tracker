@@ -25,11 +25,13 @@ interface Category {
 interface AddExpenseDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onExpenseAdded?: () => void;
 }
 
 export function AddExpenseDrawer({
 	open,
 	onOpenChange,
+	onExpenseAdded,
 }: AddExpenseDrawerProps) {
 	const { user } = useAuth();
 	const [title, setTitle] = useState('');
@@ -193,6 +195,7 @@ export function AddExpenseDrawer({
 			setDescription('');
 			setCategoryId('');
 			setDate(new Date().toISOString().split('T')[0]);
+			onExpenseAdded?.();
 			onOpenChange(false);
 		} catch (err) {
 			console.error('Error creating expense:', err);
