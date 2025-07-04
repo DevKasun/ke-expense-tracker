@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/supabase-server'
-import { expenseSchema, createExpense, ensureUserExists, getExpensesWithRelations } from '@/lib/db-helpers'
+import { expenseSchema, createExpense, ensureUserExists, getExpensesWithRelations, getMonthlyExpenseSummary } from '@/lib/db-helpers'
 import { z } from 'zod'
 
 const createExpenseRequestSchema = z.object({
@@ -29,9 +29,21 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url)
         const limit = parseInt(searchParams.get('limit') || '50')
+        const year = searchParams.get('year')
+        const month = searchParams.get('month')
 
+        // If year and month are provided, get monthly summary
+        if (year && month) {
+            const expenses = await getMonthlyExpenseSummary(
+                user.id,
+                parseInt(year),
+                parseInt(month)
+            )
+            return NextResponse.json(expenses)
+        }
+
+        // Otherwise, get all expenses
         const expenses = await getExpensesWithRelations(user.id, limit)
-
         return NextResponse.json(expenses)
     } catch (error) {
         console.error('Error fetching expenses:', error)

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,52 @@ import Link from 'next/link';
 export default function DashboardPage() {
 	const { user } = useAuth();
 	const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+	const [currentMonthTotal, setCurrentMonthTotal] = useState(0);
+	const [currentMonthCount, setCurrentMonthCount] = useState(0);
+	const [loading, setLoading] = useState(true);
+
+	const fetchCurrentMonthData = async () => {
+		try {
+			const now = new Date();
+			const year = now.getFullYear();
+			const month = now.getMonth() + 1;
+
+			const response = await fetch(
+				`/api/expenses?year=${year}&month=${month}`
+			);
+
+			if (response.ok) {
+				const expenses = await response.json();
+				const total = expenses.reduce(
+					(sum: number, expense: any) => sum + expense.amount,
+					0
+				);
+				setCurrentMonthTotal(total);
+				setCurrentMonthCount(expenses.length);
+			}
+		} catch (error) {
+			console.error('Error fetching current month data:', error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		if (user) {
+			fetchCurrentMonthData();
+		}
+	}, [user]);
+
+	const formatCurrency = (amount: number) => {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+		}).format(amount);
+	};
+
+	const getCurrentMonthName = () => {
+		return new Date().toLocaleDateString('en-US', { month: 'long' });
+	};
 
 	return (
 		<div className='max-w-4xl mx-auto space-y-6'>
@@ -44,11 +90,23 @@ export default function DashboardPage() {
 				</Card>
 
 				<Card className='p-6'>
-					<h3 className='text-lg font-semibold mb-2'>This Month</h3>
+					<h3 className='text-lg font-semibold mb-2'>
+						{getCurrentMonthName()} Summary
+					</h3>
 					<div className='space-y-2'>
 						<div className='flex justify-between'>
 							<span className='text-gray-600'>Total Spent:</span>
-							<span className='font-semibold'>$0.00</span>
+							<span className='font-semibold'>
+								{loading
+									? '...'
+									: formatCurrency(currentMonthTotal)}
+							</span>
+						</div>
+						<div className='flex justify-between'>
+							<span className='text-gray-600'>Transactions:</span>
+							<span className='font-semibold'>
+								{loading ? '...' : currentMonthCount}
+							</span>
 						</div>
 					</div>
 				</Card>
@@ -69,6 +127,7 @@ export default function DashboardPage() {
 			<AddExpenseDrawer
 				open={isAddExpenseOpen}
 				onOpenChange={setIsAddExpenseOpen}
+				onExpenseAdded={fetchCurrentMonthData}
 			/>
 		</div>
 	);

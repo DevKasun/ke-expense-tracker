@@ -15,12 +15,25 @@ export default function ExpensesPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
 
+	// Month navigation state
+	const [currentDate, setCurrentDate] = useState(new Date());
+	const [viewMode, setViewMode] = useState<'current' | 'all'>('current');
+
 	const fetchExpenses = async () => {
 		try {
 			setLoading(true);
 			setError(null);
 
-			const response = await fetch('/api/expenses');
+			let url = '/api/expenses';
+
+			// Add month/year params if viewing current month
+			if (viewMode === 'current') {
+				const year = currentDate.getFullYear();
+				const month = currentDate.getMonth() + 1;
+				url += `?year=${year}&month=${month}`;
+			}
+
+			const response = await fetch(url);
 
 			if (!response.ok) {
 				throw new Error('Failed to fetch expenses');
@@ -42,7 +55,7 @@ export default function ExpensesPage() {
 		if (user) {
 			fetchExpenses();
 		}
-	}, [user]);
+	}, [user, currentDate, viewMode]);
 
 	const handleExpenseAdded = () => {
 		fetchExpenses();
@@ -61,6 +74,33 @@ export default function ExpensesPage() {
 		}).format(amount);
 	};
 
+	const navigateMonth = (direction: 'prev' | 'next') => {
+		setCurrentDate((prev) => {
+			const newDate = new Date(prev);
+			if (direction === 'prev') {
+				newDate.setMonth(newDate.getMonth() - 1);
+			} else {
+				newDate.setMonth(newDate.getMonth() + 1);
+			}
+			return newDate;
+		});
+	};
+
+	const formatMonthYear = (date: Date) => {
+		return date.toLocaleDateString('en-US', {
+			month: 'long',
+			year: 'numeric',
+		});
+	};
+
+	const isCurrentMonth = () => {
+		const now = new Date();
+		return (
+			currentDate.getMonth() === now.getMonth() &&
+			currentDate.getFullYear() === now.getFullYear()
+		);
+	};
+
 	return (
 		<div className='max-w-6xl mx-auto space-y-6'>
 			<div className='flex items-center justify-between'>
@@ -72,16 +112,69 @@ export default function ExpensesPage() {
 						View and manage your expense records
 					</p>
 				</div>
-				<Button onClick={() => setIsAddExpenseOpen(true)}>
-					Add Expense
-				</Button>
+				<div className='flex items-center gap-3'>
+					<Button
+						variant={viewMode === 'current' ? 'default' : 'outline'}
+						onClick={() => setViewMode('current')}
+						size='sm'
+					>
+						Current Month
+					</Button>
+					<Button
+						variant={viewMode === 'all' ? 'default' : 'outline'}
+						onClick={() => setViewMode('all')}
+						size='sm'
+					>
+						All Time
+					</Button>
+					<Button onClick={() => setIsAddExpenseOpen(true)}>
+						Add Expense
+					</Button>
+				</div>
 			</div>
+
+			{/* Month Navigation */}
+			{viewMode === 'current' && (
+				<Card className='p-4'>
+					<div className='flex items-center justify-between'>
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={() => navigateMonth('prev')}
+						>
+							← Previous
+						</Button>
+						<div className='flex items-center gap-4'>
+							<h2 className='text-xl font-semibold'>
+								{formatMonthYear(currentDate)}
+							</h2>
+							{!isCurrentMonth() && (
+								<Button
+									variant='outline'
+									size='sm'
+									onClick={() => setCurrentDate(new Date())}
+								>
+									Current Month
+								</Button>
+							)}
+						</div>
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={() => navigateMonth('next')}
+							disabled={isCurrentMonth()}
+						>
+							Next →
+						</Button>
+					</div>
+				</Card>
+			)}
 
 			{/* Summary Cards */}
 			<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
 				<Card className='p-6'>
 					<h3 className='text-lg font-semibold mb-2'>
-						Total Expenses
+						{viewMode === 'current' ? 'Month' : 'Total'} Expenses
 					</h3>
 					<p className='text-3xl font-bold text-gray-900'>
 						{formatCurrency(totalAmount)}
@@ -90,7 +183,8 @@ export default function ExpensesPage() {
 
 				<Card className='p-6'>
 					<h3 className='text-lg font-semibold mb-2'>
-						Total Transactions
+						{viewMode === 'current' ? 'Month' : 'Total'}{' '}
+						Transactions
 					</h3>
 					<p className='text-3xl font-bold text-gray-900'>
 						{expenses.length}
@@ -126,7 +220,9 @@ export default function ExpensesPage() {
 				<div>
 					<div className='flex items-center justify-between mb-4'>
 						<h2 className='text-xl font-semibold'>
-							Recent Expenses
+							{viewMode === 'current'
+								? `${formatMonthYear(currentDate)} Expenses`
+								: 'All Expenses'}
 						</h2>
 						{!loading && expenses.length > 0 && (
 							<Button
