@@ -201,3 +201,162 @@ export async function ensureUserExists(userId: string, email: string) {
         }
     }
 }
+
+export async function getCategoryAnalytics(userId: string, year?: number, month?: number) {
+    const supabase = await createServerSupabaseClient()
+
+    let query = supabase
+        .from('expenses')
+        .select(`
+            amount,
+            category:categories(name, color, icon)
+        `)
+        .eq('user_id', userId)
+
+    if (year && month) {
+        const startDate = `${year}-${month.toString().padStart(2, '0')}-01`
+        const endDate = new Date(year, month, 0).toISOString().split('T')[0]
+        query = query.gte('date', startDate).lte('date', endDate)
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+
+    // Group by category and sum amounts
+    const categoryTotals = (data || []).reduce((acc: any, expense: any) => {
+        const categoryName = expense.category.name
+        if (!acc[categoryName]) {
+            acc[categoryName] = {
+                name: categoryName,
+                color: expense.category.color,
+                icon: expense.category.icon,
+                amount: 0,
+                count: 0
+            }
+        }
+        acc[categoryName].amount += expense.amount
+        acc[categoryName].count += 1
+        return acc
+    }, {})
+
+    return Object.values(categoryTotals)
+}
+
+export async function getSpendingTrends(userId: string, days: number = 30) {
+    const supabase = await createServerSupabaseClient()
+
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - days)
+
+    const { data, error } = await supabase
+        .from('expenses')
+        .select('amount, date')
+        .eq('user_id', userId)
+        .gte('date', startDate.toISOString().split('T')[0])
+        .order('date', { ascending: true })
+
+    if (error) throw error
+
+    // Group by date and sum amounts
+    const dailyTotals = (data || []).reduce((acc: any, expense: any) => {
+        const date = expense.date
+        if (!acc[date]) {
+            acc[date] = { date, amount: 0, count: 0 }
+        }
+        acc[date].amount += expense.amount
+        acc[date].count += 1
+        return acc
+    }, {})
+
+    return Object.values(dailyTotals)
+}
+
+export async function getMonthlyComparison(userId: string, months: number = 6) {
+    const supabase = await createServerSupabaseClient()
+
+    const startDate = new Date()
+    startDate.setMonth(startDate.getMonth() - months)
+
+    const { data, error } = await supabase
+        .from('expenses')
+        .select('amount, date')
+        .eq('user_id', userId)
+        .gte('date', startDate.toISOString().split('T')[0])
+        .order('date', { ascending: true })
+
+    if (error) throw error
+
+    // Group by month and sum amounts
+    const monthlyTotals = (data || []).reduce((acc: any, expense: any) => {
+        const date = new Date(expense.date)
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+
+        if (!acc[monthKey]) {
+            acc[monthKey] = { month: monthName, amount: 0, count: 0 }
+        }
+        acc[monthKey].amount += expense.amount
+        acc[monthKey].count += 1
+        return acc
+    }, {})
+
+    return Object.values(monthlyTotals)
+}
+
+export async function getExpenseSummary(userId: string) {
+    const supabase = await createServerSupabaseClient()
+
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1
+    const currentYear = now.getFullYear()
+
+    // Current month
+    const currentMonthStart = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`
+    const currentMonthEnd = new Date(currentYear, currentMonth, 0).toISOString().split('T')[0]
+
+    // Previous month
+    const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1
+    const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear
+    const prevMonthStart = `${prevYear}-${prevMonth.toString().padStart(2, '0')}-01`
+    const prevMonthEnd = new Date(prevYear, prevMonth, 0).toISOString().split('T')[0]
+
+    const [currentMonthData, prevMonthData, totalData] = await Promise.all([
+        supabase
+            .from('expenses')
+            .select('amount')
+            .eq('user_id', userId)
+            .gte('date', currentMonthStart)
+            .lte('date', currentMonthEnd),
+        supabase
+            .from('expenses')
+            .select('amount')
+            .eq('user_id', userId)
+            .gte('date', prevMonthStart)
+            .lte('date', prevMonthEnd),
+        supabase
+            .from('expenses')
+            .select('amount')
+            .eq('user_id', userId)
+    ])
+
+    const currentMonthTotal = currentMonthData.data?.reduce((sum, exp) => sum + exp.amount, 0) || 0
+    const prevMonthTotal = prevMonthData.data?.reduce((sum, exp) => sum + exp.amount, 0) || 0
+    const totalSpent = totalData.data?.reduce((sum, exp) => sum + exp.amount, 0) || 0
+
+    const monthlyChange = prevMonthTotal === 0 ? 0 : ((currentMonthTotal - prevMonthTotal) / prevMonthTotal) * 100
+
+    return {
+        currentMonth: {
+            total: currentMonthTotal,
+            count: currentMonthData.data?.length || 0
+        },
+        previousMonth: {
+            total: prevMonthTotal,
+            count: prevMonthData.data?.length || 0
+        },
+        totalSpent,
+        totalTransactions: totalData.data?.length || 0,
+        monthlyChange
+    }
+}
