@@ -6,7 +6,15 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import { DollarSign, BarChart3, Building2, Menu } from 'lucide-react';
+import {
+	DollarSign,
+	BarChart3,
+	Building2,
+	Menu,
+	Tags,
+	TrendingUp,
+	Calendar,
+} from 'lucide-react';
 import Link from 'next/link';
 import { APP_NAME } from '@/constant';
 
@@ -111,7 +119,7 @@ export default function Home() {
 							</p>
 						</div>
 
-						<div className='grid md:grid-cols-3 gap-8 max-w-5xl mx-auto'>
+						<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'>
 							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
 								<CardHeader>
 									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -153,17 +161,71 @@ export default function Home() {
 							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
 								<CardHeader>
 									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-										<Building2 className='h-8 w-8 text-gray-900' />
+										<Tags className='h-8 w-8 text-gray-900' />
 									</div>
 									<CardTitle className='text-xl font-semibold'>
-										Multi Account
+										Custom Categories
 									</CardTitle>
 								</CardHeader>
 								<CardContent>
 									<CardDescription className='text-gray-600'>
-										Connect multiple bank accounts and
-										credit cards. Get a complete view of
-										your finances in one place.
+										Create personalized categories with
+										custom colors and icons. Organize your
+										expenses exactly how you want them.
+									</CardDescription>
+								</CardContent>
+							</Card>
+
+							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
+								<CardHeader>
+									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+										<TrendingUp className='h-8 w-8 text-gray-900' />
+									</div>
+									<CardTitle className='text-xl font-semibold'>
+										Spending Trends
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<CardDescription className='text-gray-600'>
+										Track your spending trends over time
+										with interactive charts and monthly
+										comparisons to identify patterns.
+									</CardDescription>
+								</CardContent>
+							</Card>
+
+							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
+								<CardHeader>
+									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+										<Calendar className='h-8 w-8 text-gray-900' />
+									</div>
+									<CardTitle className='text-xl font-semibold'>
+										Monthly Views
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<CardDescription className='text-gray-600'>
+										Navigate through different months to
+										review past expenses and track your
+										financial progress over time.
+									</CardDescription>
+								</CardContent>
+							</Card>
+
+							<Card className='text-center border-2 hover:border-gray-200 transition-colors'>
+								<CardHeader>
+									<div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+										<Building2 className='h-8 w-8 text-gray-900' />
+									</div>
+									<CardTitle className='text-xl font-semibold'>
+										Secure & Private
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<CardDescription className='text-gray-600'>
+										Your financial data is protected with
+										enterprise-grade security. All data is
+										encrypted and privately stored.
 									</CardDescription>
 								</CardContent>
 							</Card>
