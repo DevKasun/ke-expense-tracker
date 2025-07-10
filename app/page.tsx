@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -17,8 +19,186 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { APP_NAME } from '@/constant';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef } from 'react';
 
 export default function Home() {
+	const heroRef = useRef<HTMLDivElement>(null);
+	const featuresRef = useRef<HTMLDivElement>(null);
+	const ctaRef = useRef<HTMLDivElement>(null);
+	const footerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		gsap.registerPlugin(ScrollTrigger);
+
+		// Hero animations
+		if (heroRef.current) {
+			gsap.fromTo(
+				heroRef.current.querySelector('h1'),
+				{ opacity: 0, y: 50 },
+				{ opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
+			);
+			gsap.fromTo(
+				heroRef.current.querySelector('p'),
+				{ opacity: 0, y: 50 },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 1,
+					delay: 0.2,
+					ease: 'power3.out',
+				}
+			);
+			gsap.fromTo(
+				heroRef.current.querySelectorAll('button'),
+				{ opacity: 0, scale: 0.9 },
+				{
+					opacity: 1,
+					scale: 1,
+					duration: 0.8,
+					delay: 0.4,
+					stagger: 0.2,
+					ease: 'back.out(1.7)',
+				}
+			);
+		}
+
+		// Typewriter animation
+		if (heroRef.current) {
+			const typewriterElem = heroRef.current.querySelector('.typewriter');
+			if (typewriterElem) {
+				const fullText = 'Track Your Expenses Effortlessly';
+				let index = 0;
+
+				const tl = gsap.timeline({ repeat: -1 });
+
+				// Type forward
+				tl.to(typewriterElem, {
+					duration: fullText.length * 0.05,
+					ease: 'none',
+					onStart: () => {
+						index = 0;
+					},
+					onUpdate: () => {
+						typewriterElem.textContent = fullText.substring(
+							0,
+							++index
+						);
+					},
+				});
+
+				// Pause
+				tl.to({}, { duration: 1 });
+
+				// Type backward (delete)
+				tl.to(typewriterElem, {
+					duration: fullText.length * 0.05,
+					ease: 'none',
+					onStart: () => {
+						index = fullText.length;
+					},
+					onUpdate: () => {
+						typewriterElem.textContent = fullText.substring(
+							0,
+							--index
+						);
+					},
+				});
+
+				// Pause before repeat
+				tl.to({}, { duration: 1 });
+			}
+		}
+
+		// Features animations
+		if (featuresRef.current) {
+			const cards = featuresRef.current.querySelectorAll('.border-2');
+			gsap.from(cards, {
+				opacity: 0,
+				y: 50,
+				duration: 0.8,
+				stagger: 0.2,
+				ease: 'power3.out',
+				scrollTrigger: {
+					trigger: featuresRef.current,
+					start: 'top 80%',
+				},
+			});
+		}
+
+		// CTA animations
+		if (ctaRef.current) {
+			gsap.fromTo(
+				ctaRef.current.querySelector('h2'),
+				{ opacity: 0, y: 30 },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 1,
+					ease: 'power3.out',
+					scrollTrigger: {
+						trigger: ctaRef.current,
+						start: 'top 80%',
+					},
+				}
+			);
+			gsap.fromTo(
+				ctaRef.current.querySelector('p'),
+				{ opacity: 0, y: 30 },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 1,
+					delay: 0.2,
+					ease: 'power3.out',
+					scrollTrigger: {
+						trigger: ctaRef.current,
+						start: 'top 80%',
+					},
+				}
+			);
+			gsap.fromTo(
+				ctaRef.current.querySelector('button'),
+				{ opacity: 0, scale: 0.9 },
+				{
+					opacity: 1,
+					scale: 1,
+					duration: 0.8,
+					delay: 0.4,
+					ease: 'back.out(1.7)',
+					scrollTrigger: {
+						trigger: ctaRef.current,
+						start: 'top 80%',
+					},
+				}
+			);
+		}
+
+		// Footer animations
+		if (footerRef.current) {
+			gsap.from(footerRef.current.querySelectorAll('div'), {
+				opacity: 0,
+				y: 30,
+				duration: 0.8,
+				stagger: 0.2,
+				ease: 'power3.out',
+				scrollTrigger: {
+					trigger: footerRef.current,
+					start: 'top 90%',
+				},
+			});
+		}
+
+		// Reduced motion handling
+		const mediaQuery = window.matchMedia(
+			'(prefers-reduced-motion: reduce)'
+		);
+		if (mediaQuery.matches) {
+			gsap.globalTimeline.clear();
+		}
+	}, []);
+
 	return (
 		<div className='flex flex-col min-h-screen'>
 			<header className='border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50'>
@@ -72,14 +252,14 @@ export default function Home() {
 			</header>
 
 			<main className='flex-1'>
-				<section className='py-20 sm:py-32 bg-gradient-to-b from-gray-50 to-white'>
+				<section
+					ref={heroRef}
+					className='py-20 sm:py-32 bg-gradient-to-b from-gray-50 to-white'
+				>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 						<div className='text-center max-w-4xl mx-auto'>
 							<h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6'>
-								Track Your Expenses{' '}
-								<span className='text-gray-900'>
-									Effortlessly
-								</span>
+								<span className='typewriter'></span>
 							</h1>
 							<p className='text-xl text-gray-600 mb-10 max-w-2xl mx-auto'>
 								Take control of your finances with our simple
@@ -107,7 +287,11 @@ export default function Home() {
 					</div>
 				</section>
 
-				<section id='features' className='py-20 bg-white'>
+				<section
+					id='features'
+					ref={featuresRef}
+					className='py-20 bg-white'
+				>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 						<div className='text-center mb-16'>
 							<h2 className='text-3xl sm:text-4xl font-bold text-gray-900 mb-4'>
@@ -233,7 +417,7 @@ export default function Home() {
 					</div>
 				</section>
 
-				<section className='py-20 bg-gray-900'>
+				<section ref={ctaRef} className='py-20 bg-gray-900'>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8 text-center'>
 						<h2 className='text-3xl sm:text-4xl font-bold text-white mb-4'>
 							Ready to take control of your finances?
@@ -255,7 +439,7 @@ export default function Home() {
 				</section>
 			</main>
 
-			<footer className='bg-gray-900 text-white py-12'>
+			<footer ref={footerRef} className='bg-gray-900 text-white py-12'>
 				<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 					<div className='grid md:grid-cols-4 gap-8'>
 						<div className='col-span-2'>
