@@ -68,46 +68,49 @@ export default function Home() {
 		if (heroRef.current) {
 			const typewriterElem = heroRef.current.querySelector('.typewriter');
 			if (typewriterElem) {
-				const fullText = 'Track Your Expenses Effortlessly';
-				let index = 0;
+				const words = ['Effortlessly', 'Intelligently'];
+				let wordIndex = 0;
+				let charIndex = 0;
 
 				const tl = gsap.timeline({ repeat: -1 });
 
-				// Type forward
-				tl.to(typewriterElem, {
-					duration: fullText.length * 0.05,
-					ease: 'none',
-					onStart: () => {
-						index = 0;
-					},
-					onUpdate: () => {
-						typewriterElem.textContent = fullText.substring(
-							0,
-							++index
-						);
-					},
+				words.forEach((word, i) => {
+					// Type forward
+					tl.to(typewriterElem, {
+						duration: word.length * 0.1,
+						ease: 'none',
+						onStart: () => {
+							charIndex = 0;
+						},
+						onUpdate: () => {
+							typewriterElem.textContent = word.substring(
+								0,
+								++charIndex
+							);
+						},
+					});
+
+					// Pause
+					tl.to({}, { duration: 1.5 });
+
+					// Type backward (delete)
+					tl.to(typewriterElem, {
+						duration: word.length * 0.05,
+						ease: 'none',
+						onStart: () => {
+							charIndex = word.length;
+						},
+						onUpdate: () => {
+							typewriterElem.textContent = word.substring(
+								0,
+								--charIndex
+							);
+						},
+					});
+
+					// Pause before next word
+					tl.to({}, { duration: 0.5 });
 				});
-
-				// Pause
-				tl.to({}, { duration: 1 });
-
-				// Type backward (delete)
-				tl.to(typewriterElem, {
-					duration: fullText.length * 0.05,
-					ease: 'none',
-					onStart: () => {
-						index = fullText.length;
-					},
-					onUpdate: () => {
-						typewriterElem.textContent = fullText.substring(
-							0,
-							--index
-						);
-					},
-				});
-
-				// Pause before repeat
-				tl.to({}, { duration: 1 });
 			}
 		}
 
@@ -258,7 +261,8 @@ export default function Home() {
 				>
 					<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 						<div className='text-center max-w-4xl mx-auto'>
-							<h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6'>
+							<h1 className='text-4xl sm:text-5xl font-bold text-gray-900 mb-6'>
+								Track Your Expenses{' '}
 								<span className='typewriter'></span>
 							</h1>
 							<p className='text-xl text-gray-600 mb-10 max-w-2xl mx-auto'>
