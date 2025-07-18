@@ -111,11 +111,11 @@ export function CategoryChart({ year, month }: CategoryChartProps) {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<div className='flex flex-col lg:flex-row gap-6'>
-					<div className='flex-1'>
+				<div className='flex flex-col lg:flex-row gap-6 items-center'>
+					<div className='w-[280px] h-[280px]'>
 						<ChartContainer
 							config={chartConfig}
-							className='h-[300px]'
+							className='h-full w-full'
 						>
 							<ResponsiveContainer width='100%' height='100%'>
 								<PieChart>
@@ -124,7 +124,7 @@ export function CategoryChart({ year, month }: CategoryChartProps) {
 										cx='50%'
 										cy='50%'
 										innerRadius={60}
-										outerRadius={120}
+										outerRadius={110}
 										paddingAngle={2}
 										dataKey='amount'
 										nameKey='category'
@@ -151,7 +151,7 @@ export function CategoryChart({ year, month }: CategoryChartProps) {
 					</div>
 
 					<div className='lg:w-64'>
-						<div className='space-y-3'>
+						<div className='space-y-3 max-h-[280px] overflow-y-auto pr-2'>
 							<div className='text-center'>
 								<p className='text-sm text-muted-foreground'>
 									Total Spent
