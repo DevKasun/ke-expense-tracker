@@ -101,9 +101,9 @@ export default function DashboardLayout({
 	];
 
 	return (
-		<div className='min-h-screen bg-gray-50 flex'>
+		<div className='min-h-screen bg-gray-50'>
 			{/* Sidebar */}
-			<div className='w-64 bg-white shadow-lg border-r border-gray-200 flex flex-col'>
+			<div className='fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200 flex flex-col'>
 				{/* Sidebar Header */}
 				<div className='p-6 border-b border-gray-200'>
 					<h1 className='text-xl font-bold text-gray-900'>
@@ -185,7 +185,7 @@ export default function DashboardLayout({
 			</div>
 
 			{/* Main Content */}
-			<div className='flex-1 flex flex-col min-w-0'>
+			<div className='ml-64 flex-1 flex flex-col min-w-0'>
 				<main className='flex-1 p-8'>{children}</main>
 			</div>
 		</div>
