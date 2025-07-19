@@ -104,28 +104,33 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+export type TooltipPayloadItem = {
+	name?: string;
+	value?: number | string;
+	dataKey?: string;
+	color?: string;
+	payload?: Record<string, unknown>;
+};
+
 interface ChartTooltipContentProps {
 	active?: boolean;
-	payload?: Array<{
-		name?: string;
-		value?: number | string;
-		dataKey?: string;
-		color?: string;
-		payload?: any;
-	}>;
+	payload?: TooltipPayloadItem[];
 	label?: string;
 	className?: string;
 	indicator?: 'line' | 'dot' | 'dashed';
 	hideLabel?: boolean;
 	hideIndicator?: boolean;
-	labelFormatter?: (value: any, payload: any[]) => React.ReactNode;
+	labelFormatter?: (
+		value: string,
+		payload: TooltipPayloadItem[]
+	) => React.ReactNode;
 	labelClassName?: string;
 	formatter?: (
-		value: any,
-		name: any,
-		item: any,
+		value: number | string,
+		name: string,
+		item: TooltipPayloadItem,
 		index: number,
-		payload: any
+		payload: TooltipPayloadItem[]
 	) => React.ReactNode;
 	color?: string;
 	nameKey?: string;
@@ -165,7 +170,7 @@ function ChartTooltipContent({
 		if (labelFormatter) {
 			return (
 				<div className={cn('font-medium', labelClassName)}>
-					{labelFormatter(value, payload)}
+					{labelFormatter(value as string, payload)}
 				</div>
 			);
 		}
@@ -228,7 +233,7 @@ function ChartTooltipContent({
 									item.name,
 									item,
 									index,
-									item.payload
+									payload
 								)
 							) : (
 								<>
@@ -366,7 +371,7 @@ function ChartLegendContent({
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(
 	config: ChartConfig,
-	payload: unknown,
+	payload: TooltipPayloadItem,
 	key: string
 ) {
 	if (typeof payload !== 'object' || payload === null) {

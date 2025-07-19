@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/supabase-server'
-import { expenseSchema, createExpense, ensureUserExists, getExpensesWithRelations, getMonthlyExpenseSummary } from '@/lib/db-helpers'
+import { createExpense, ensureUserExists, getExpensesWithRelations, getMonthlyExpenseSummary } from '@/lib/db-helpers'
 import { z } from 'zod'
 
 const createExpenseRequestSchema = z.object({

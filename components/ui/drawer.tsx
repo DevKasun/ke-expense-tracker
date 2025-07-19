@@ -73,7 +73,7 @@ function Drawer({ children, open, onOpenChange }: DrawerProps) {
 	);
 }
 
-interface DrawerOverlayProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DrawerOverlayProps = React.ComponentProps<'div'>;
 
 function DrawerOverlay({ className, ...props }: DrawerOverlayProps) {
 	const { open, onOpenChange } = useDrawer();
@@ -93,7 +93,7 @@ function DrawerOverlay({ className, ...props }: DrawerOverlayProps) {
 }
 
 interface DrawerContentProps
-	extends React.HTMLAttributes<HTMLDivElement>,
+	extends React.ComponentProps<'div'>,
 		VariantProps<typeof drawerVariants> {}
 
 function DrawerContent({
@@ -123,7 +123,7 @@ function DrawerContent({
 	);
 }
 
-interface DrawerHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DrawerHeaderProps = React.ComponentProps<'div'>;
 
 function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
 	return (
@@ -137,14 +137,13 @@ function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
 	);
 }
 
-interface DrawerTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+type DrawerTitleProps = React.ComponentProps<'h2'>;
 
 function DrawerTitle({ className, ...props }: DrawerTitleProps) {
 	return <h2 className={cn('text-lg font-semibold', className)} {...props} />;
 }
 
-interface DrawerCloseProps
-	extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+type DrawerCloseProps = React.ComponentProps<'button'>;
 
 function DrawerClose({ className, children, ...props }: DrawerCloseProps) {
 	const { onOpenChange } = useDrawer();
@@ -177,7 +176,7 @@ function DrawerClose({ className, children, ...props }: DrawerCloseProps) {
 	);
 }
 
-interface DrawerBodyProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DrawerBodyProps = React.ComponentProps<'div'>;
 
 function DrawerBody({ className, ...props }: DrawerBodyProps) {
 	return (
@@ -188,7 +187,7 @@ function DrawerBody({ className, ...props }: DrawerBodyProps) {
 	);
 }
 
-interface DrawerFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DrawerFooterProps = React.ComponentProps<'div'>;
 
 function DrawerFooter({ className, ...props }: DrawerFooterProps) {
 	return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import {
 	Card,
@@ -28,15 +28,18 @@ interface CategoryChartProps {
 	month?: number;
 }
 
+interface ChartConfig {
+    [key: string]: {
+        label: string;
+        color: string;
+    };
+}
+
 export function CategoryChart({ year, month }: CategoryChartProps) {
 	const [data, setData] = useState<CategoryData[]>([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		fetchCategoryData();
-	}, [year, month]);
-
-	const fetchCategoryData = async () => {
+	const fetchCategoryData = useCallback(async () => {
 		try {
 			setLoading(true);
 			const params = new URLSearchParams({ type: 'categories' });
@@ -53,7 +56,11 @@ export function CategoryChart({ year, month }: CategoryChartProps) {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [year, month]);
+
+	useEffect(() => {
+		fetchCategoryData();
+	}, [fetchCategoryData]);
 
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
@@ -62,13 +69,13 @@ export function CategoryChart({ year, month }: CategoryChartProps) {
 		}).format(amount);
 	};
 
-	const chartConfig = data.reduce((config, item, index) => {
+	const chartConfig = data.reduce((config, item) => {
 		config[item.name] = {
 			label: item.name,
 			color: item.color,
 		};
 		return config;
-	}, {} as any);
+	}, {} as ChartConfig);
 
 	const chartData = data.map((item) => ({
 		category: item.name,
@@ -139,8 +146,8 @@ export function CategoryChart({ year, month }: CategoryChartProps) {
 									<ChartTooltip
 										content={
 											<ChartTooltipContent
-												formatter={(value: any) =>
-													formatCurrency(value)
+												formatter={(value) =>
+													formatCurrency(Number(value))
 												}
 											/>
 										}

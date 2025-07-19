@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { ExpenseWithRelations } from '@/lib/db-helpers';
 import { ExpensesTable } from '@/components/expenses/expenses-table';
@@ -19,7 +19,7 @@ export default function ExpensesPage() {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [viewMode, setViewMode] = useState<'current' | 'all'>('current');
 
-	const fetchExpenses = async () => {
+	const fetchExpenses = useCallback(async () => {
 		try {
 			setLoading(true);
 			setError(null);
@@ -49,13 +49,13 @@ export default function ExpensesPage() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [currentDate, viewMode]);
 
 	useEffect(() => {
 		if (user) {
 			fetchExpenses();
 		}
-	}, [user, currentDate, viewMode]);
+	}, [user, fetchExpenses]);
 
 	const handleExpenseAdded = () => {
 		fetchExpenses();

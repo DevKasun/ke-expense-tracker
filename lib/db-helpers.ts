@@ -209,6 +209,7 @@ export async function getCategoryAnalytics(userId: string, year?: number, month?
         .from('expenses')
         .select(`
             amount,
+            category_id,
             category:categories(name, color, icon)
         `)
         .eq('user_id', userId)
@@ -224,21 +225,27 @@ export async function getCategoryAnalytics(userId: string, year?: number, month?
     if (error) throw error
 
     // Group by category and sum amounts
-    const categoryTotals = (data || []).reduce((acc: any, expense: any) => {
-        const categoryName = expense.category.name
+    const categoryTotals = (data || []).reduce((acc, expense) => {
+        if (!expense.category) return acc;
+
+        const category = Array.isArray(expense.category) ? expense.category[0] : expense.category
+
+        if (!category) return acc;
+
+        const categoryName = category.name;
         if (!acc[categoryName]) {
             acc[categoryName] = {
                 name: categoryName,
-                color: expense.category.color,
-                icon: expense.category.icon,
+                color: category.color,
+                icon: category.icon,
                 amount: 0,
                 count: 0
-            }
+            };
         }
-        acc[categoryName].amount += expense.amount
-        acc[categoryName].count += 1
-        return acc
-    }, {})
+        acc[categoryName].amount += expense.amount;
+        acc[categoryName].count += 1;
+        return acc;
+    }, {} as Record<string, { name: string; color: string; icon?: string; amount: number; count: number }>)
 
     return Object.values(categoryTotals)
 }
@@ -259,17 +266,19 @@ export async function getSpendingTrends(userId: string, days: number = 30) {
     if (error) throw error
 
     // Group by date and sum amounts
-    const dailyTotals = (data || []).reduce((acc: any, expense: any) => {
-        const date = expense.date
+    const dailyTotals = (data || []).reduce((acc, expense) => {
+        const date = new Date(expense.date).toISOString().split('T')[0]
         if (!acc[date]) {
             acc[date] = { date, amount: 0, count: 0 }
         }
         acc[date].amount += expense.amount
         acc[date].count += 1
         return acc
-    }, {})
+    }, {} as Record<string, { date: string; amount: number; count: number }>)
 
-    return Object.values(dailyTotals)
+    return Object.values(dailyTotals).sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
 }
 
 export async function getMonthlyComparison(userId: string, months: number = 6) {
@@ -288,20 +297,23 @@ export async function getMonthlyComparison(userId: string, months: number = 6) {
     if (error) throw error
 
     // Group by month and sum amounts
-    const monthlyTotals = (data || []).reduce((acc: any, expense: any) => {
-        const date = new Date(expense.date)
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-
-        if (!acc[monthKey]) {
-            acc[monthKey] = { month: monthName, amount: 0, count: 0 }
+    const monthlyTotals = (data || []).reduce((acc, expense) => {
+        const month = new Date(expense.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+        });
+        if (!acc[month]) {
+            acc[month] = { month, amount: 0, count: 0 };
         }
-        acc[monthKey].amount += expense.amount
-        acc[monthKey].count += 1
-        return acc
-    }, {})
+        acc[month].amount += expense.amount;
+        acc[month].count += 1;
+        return acc;
+    }, {} as Record<string, { month: string; amount: number; count: number }>)
 
-    return Object.values(monthlyTotals)
+    const sortedMonths = Object.values(monthlyTotals).sort(
+        (a, b) => new Date(a.month).getTime() - new Date(b.month).getTime()
+    );
+    return sortedMonths.slice(-months);
 }
 
 export async function getExpenseSummary(userId: string) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { createClient } from '@/lib/supabase/supabase';
 import {
@@ -51,7 +51,7 @@ export function AddExpenseDrawer({
 	const [newCategoryIcon, setNewCategoryIcon] = useState('');
 	const [creatingCategory, setCreatingCategory] = useState(false);
 
-	const supabase = createClient();
+	const supabase = useMemo(() => createClient(), []);
 
 	// Predefined color options
 	const colorOptions = [
@@ -89,19 +89,14 @@ export function AddExpenseDrawer({
 		'⛽',
 	];
 
-	useEffect(() => {
-		if (open && user) {
-			fetchCategories();
-		}
-	}, [open, user]);
-
-	const fetchCategories = async () => {
+	const fetchCategories = useCallback(async () => {
+		if (!user) return;
 		try {
 			setCategoriesLoading(true);
 			const { data, error } = await supabase
 				.from('categories')
 				.select('id, name, color, icon')
-				.eq('user_id', user?.id)
+				.eq('user_id', user.id)
 				.order('name');
 
 			if (error) throw error;
@@ -112,7 +107,13 @@ export function AddExpenseDrawer({
 		} finally {
 			setCategoriesLoading(false);
 		}
-	};
+	}, [supabase, user]);
+
+	useEffect(() => {
+		if (open && user) {
+			fetchCategories();
+		}
+	}, [open, user, fetchCategories]);
 
 	const handleCreateCategory = async () => {
 		if (!newCategoryName.trim() || !user) return;

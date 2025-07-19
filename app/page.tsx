@@ -69,12 +69,11 @@ export default function Home() {
 			const typewriterElem = heroRef.current.querySelector('.typewriter');
 			if (typewriterElem) {
 				const words = ['Effortlessly', 'Intelligently'];
-				let wordIndex = 0;
 				let charIndex = 0;
 
 				const tl = gsap.timeline({ repeat: -1 });
 
-				words.forEach((word, i) => {
+				words.forEach((word) => {
 					// Type forward
 					tl.to(typewriterElem, {
 						duration: word.length * 0.1,
