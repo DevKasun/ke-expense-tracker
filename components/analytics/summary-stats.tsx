@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
 	TrendingUp,
@@ -25,13 +25,13 @@ interface SummaryData {
 	monthlyChange: number;
 }
 
-export function SummaryStats() {
+export interface SummaryStatsRef {
+	refresh: () => void;
+}
+
+export const SummaryStats = forwardRef<SummaryStatsRef>((props, ref) => {
 	const [data, setData] = useState<SummaryData | null>(null);
 	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		fetchSummaryData();
-	}, []);
 
 	const fetchSummaryData = async () => {
 		try {
@@ -48,6 +48,14 @@ export function SummaryStats() {
 			setLoading(false);
 		}
 	};
+
+	useImperativeHandle(ref, () => ({
+		refresh: fetchSummaryData,
+	}));
+
+	useEffect(() => {
+		fetchSummaryData();
+	}, []);
 
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
@@ -169,4 +177,6 @@ export function SummaryStats() {
 			))}
 		</div>
 	);
-}
+});
+
+SummaryStats.displayName = 'SummaryStats';

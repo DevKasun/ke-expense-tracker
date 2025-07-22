@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	forwardRef,
+	useImperativeHandle,
+} from 'react';
 import {
 	BarChart,
 	Bar,
@@ -33,9 +39,14 @@ interface MonthlyComparisonChartProps {
 	months?: number;
 }
 
-export function MonthlyComparisonChart({
-	months = 6,
-}: MonthlyComparisonChartProps) {
+export interface MonthlyComparisonChartRef {
+	refresh: () => void;
+}
+
+export const MonthlyComparisonChart = forwardRef<
+	MonthlyComparisonChartRef,
+	MonthlyComparisonChartProps
+>(({ months = 6 }, ref) => {
 	const [data, setData] = useState<MonthlyData[]>([]);
 	const [loading, setLoading] = useState(true);
 
@@ -58,6 +69,10 @@ export function MonthlyComparisonChart({
 			setLoading(false);
 		}
 	}, [months]);
+
+	useImperativeHandle(ref, () => ({
+		refresh: fetchMonthlyData,
+	}));
 
 	useEffect(() => {
 		fetchMonthlyData();
@@ -199,4 +214,6 @@ export function MonthlyComparisonChart({
 			</CardContent>
 		</Card>
 	);
-}
+});
+
+MonthlyComparisonChart.displayName = 'MonthlyComparisonChart';

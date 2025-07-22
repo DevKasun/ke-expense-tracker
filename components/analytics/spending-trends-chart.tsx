@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	forwardRef,
+	useImperativeHandle,
+} from 'react';
 import {
 	LineChart,
 	Line,
@@ -33,7 +39,14 @@ interface SpendingTrendsChartProps {
 	days?: number;
 }
 
-export function SpendingTrendsChart({ days = 30 }: SpendingTrendsChartProps) {
+export interface SpendingTrendsChartRef {
+	refresh: () => void;
+}
+
+export const SpendingTrendsChart = forwardRef<
+	SpendingTrendsChartRef,
+	SpendingTrendsChartProps
+>(({ days = 30 }, ref) => {
 	const [data, setData] = useState<TrendData[]>([]);
 	const [loading, setLoading] = useState(true);
 
@@ -56,6 +69,10 @@ export function SpendingTrendsChart({ days = 30 }: SpendingTrendsChartProps) {
 			setLoading(false);
 		}
 	}, [days]);
+
+	useImperativeHandle(ref, () => ({
+		refresh: fetchTrendData,
+	}));
 
 	useEffect(() => {
 		fetchTrendData();
@@ -224,4 +241,6 @@ export function SpendingTrendsChart({ days = 30 }: SpendingTrendsChartProps) {
 			</CardContent>
 		</Card>
 	);
-}
+});
+
+SpendingTrendsChart.displayName = 'SpendingTrendsChart';

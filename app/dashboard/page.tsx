@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,13 @@ export default function DashboardPage() {
 		[]
 	);
 	const [loading, setLoading] = useState(true);
+	const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+	// Refs to trigger refresh in child components
+	const summaryStatsRef = useRef<{ refresh: () => void }>(null);
+	const categoryChartRef = useRef<{ refresh: () => void }>(null);
+	const spendingTrendsRef = useRef<{ refresh: () => void }>(null);
+	const monthlyComparisonRef = useRef<{ refresh: () => void }>(null);
 
 	const fetchRecentExpenses = async () => {
 		try {
@@ -58,7 +65,7 @@ export default function DashboardPage() {
 		if (user) {
 			fetchRecentExpenses();
 		}
-	}, [user]);
+	}, [user, refreshTrigger]);
 
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
@@ -75,9 +82,13 @@ export default function DashboardPage() {
 	};
 
 	const handleExpenseAdded = () => {
+		// Trigger refresh for all components
+		setRefreshTrigger((prev) => prev + 1);
+		summaryStatsRef.current?.refresh();
+		categoryChartRef.current?.refresh();
+		spendingTrendsRef.current?.refresh();
+		monthlyComparisonRef.current?.refresh();
 		fetchRecentExpenses();
-		// This will trigger a re-render of all analytics components
-		window.location.reload();
 	};
 
 	return (
@@ -98,16 +109,16 @@ export default function DashboardPage() {
 			</div>
 
 			{/* Summary Stats */}
-			<SummaryStats />
+			<SummaryStats ref={summaryStatsRef} />
 
 			{/* Charts Grid */}
 			<div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-				<CategoryChart />
-				<SpendingTrendsChart />
+				<CategoryChart ref={categoryChartRef} />
+				<SpendingTrendsChart ref={spendingTrendsRef} />
 			</div>
 
 			{/* Monthly Comparison - Full Width */}
-			<MonthlyComparisonChart />
+			<MonthlyComparisonChart ref={monthlyComparisonRef} />
 
 			{/* Recent Expenses */}
 			<Card>
