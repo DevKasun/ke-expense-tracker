@@ -81,8 +81,10 @@ export const SpendingTrendsChart = forwardRef<
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',
-			currency: 'USD',
-		}).format(amount);
+			currency: 'LKR',
+		})
+			.format(amount)
+			.replace('LKR', 'Rs.');
 	};
 
 	const formatDate = (dateString: string) => {

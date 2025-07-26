@@ -60,8 +60,10 @@ export const SummaryStats = forwardRef<SummaryStatsRef>((props, ref) => {
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',
-			currency: 'USD',
-		}).format(amount);
+			currency: 'LKR',
+		})
+			.format(amount)
+			.replace('LKR', 'Rs.');
 	};
 
 	const formatPercentage = (percentage: number) => {

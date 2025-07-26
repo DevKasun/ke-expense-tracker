@@ -80,8 +80,10 @@ export const CategoryChart = forwardRef<CategoryChartRef, CategoryChartProps>(
 		const formatCurrency = (amount: number) => {
 			return new Intl.NumberFormat('en-US', {
 				style: 'currency',
-				currency: 'USD',
-			}).format(amount);
+				currency: 'LKR',
+			})
+				.format(amount)
+				.replace('LKR', 'Rs.');
 		};
 
 		const chartConfig = data.reduce((config, item) => {
@@ -227,6 +229,7 @@ export const CategoryChart = forwardRef<CategoryChartRef, CategoryChartProps>(
 				</CardContent>
 			</Card>
 		);
-	});
+	}
+);
 
 CategoryChart.displayName = 'CategoryChart';

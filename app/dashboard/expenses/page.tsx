@@ -70,8 +70,10 @@ export default function ExpensesPage() {
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',
-			currency: 'USD',
-		}).format(amount);
+			currency: 'LKRs',
+		})
+			.format(amount)
+			.replace('LKR', 'Rs.');
 	};
 
 	const navigateMonth = (direction: 'prev' | 'next') => {

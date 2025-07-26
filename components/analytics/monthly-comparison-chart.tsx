@@ -81,8 +81,10 @@ export const MonthlyComparisonChart = forwardRef<
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',
-			currency: 'USD',
-		}).format(amount);
+			currency: 'LKR',
+		})
+			.format(amount)
+			.replace('LKR', 'Rs.');
 	};
 
 	const chartConfig = {
